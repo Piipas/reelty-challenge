@@ -1,0 +1,13 @@
+{
+  "name": "challenge-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm -r --parallel run dev",
+    "dev:app": "pnpm --filter app dev",
+    "dev:render": "pnpm --filter render dev",
+    "build": "pnpm -r run build",
+    "build:app": "pnpm --filter app build",
+    "build:render": "pnpm --filter render build"
+  }
+}

@@ -1,0 +1,203 @@
+"use client";
+
+import { getClipWidth, GAP_BETWEEN_CLIPS, getConstrainedHeight } from "@/data/constants";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePinchZoom } from "@/hooks/use-pinch-zoom";
+import StaticTextOverlay from "./static-text-overlay";
+import { SAMPLE_VIDEOS } from "@/data/sample-videos";
+import VideoClipCard from "./video-clip-card";
+import { twMerge } from "tailwind-merge";
+import { Button } from "./ui/button";
+import Magnifier from "./magnifier";
+import { Plus } from "lucide-react";
+import TextDock from "./text-dock";
+
+export default function tchVideoEditor() {
+  const ratio: "portrait" | "landscape" = "portrait";
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const clipsScrollContainerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const [textInput, setTextInput] = useState("");
+  const [appliedText, setAppliedText] = useState("");
+  const [selectedTextAnimation, setSelectedTextAnimation] = useState<string | null>(null);
+  const [isTextOpen, setIsTextOpen] = useState(false);
+  const [isTextActive, setIsTextActive] = useState(false);
+  const [textStartPosition, setTextStartPosition] = useState(1);
+  const [textClipCount, setTextClipCount] = useState(2);
+
+  const [activeClips, setActiveClips] = useState(SAMPLE_VIDEOS);
+  const [removedClips, setRemovedClips] = useState<typeof SAMPLE_VIDEOS>([]);
+
+  const handleZoomChange = useCallback((newZoom: number) => setZoomLevel(newZoom), []);
+  const { setZoom: setPinchZoom } = usePinchZoom({
+    minZoom: 0.33,
+    maxZoom: 2.22,
+    sensitivity: 0.08,
+    onZoomChange: handleZoomChange,
+    containerRef,
+  });
+
+  useEffect(() => {
+    setPinchZoom(zoomLevel);
+  }, [zoomLevel, setPinchZoom]);
+
+  const clipWidth = getClipWidth(ratio, zoomLevel);
+  const constrainedHeight = getConstrainedHeight(ratio, zoomLevel);
+
+  const handleApplyText = () => {
+    if (textInput && selectedTextAnimation) {
+      setAppliedText(textInput);
+      setIsTextActive(true);
+      setIsTextOpen(false);
+    }
+  };
+
+  const handleResetText = () => {
+    setTextInput("");
+    setAppliedText("");
+    setSelectedTextAnimation(null);
+    setIsTextActive(false);
+    setTextStartPosition(1);
+    setTextClipCount(2);
+  };
+
+  const handleTextClick = () => setIsTextOpen(true);
+
+  const handleRemoveClip = (id: string) => {
+    const clip = activeClips.find((c) => c.id === id);
+    if (clip) {
+      setActiveClips(activeClips.filter((c) => c.id !== id));
+      setRemovedClips([...removedClips, clip]);
+    }
+  };
+
+  const handleAddClip = (id: string) => {
+    const clip = removedClips.find((c) => c.id === id);
+    if (clip) {
+      setRemovedClips(removedClips.filter((c) => c.id !== id));
+      setActiveClips([...activeClips, clip]);
+    }
+  };
+
+  return (
+    <div className="flex h-full max-h-full flex-col overflow-hidden">
+      <div className="shrink-0 p-6 md:px-8 md:py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1">
+              <p className="text-lg font-medium">Edit</p>
+            </div>
+            <div className="size-1.5 rounded-full bg-[#D9D9D9]" />
+            <div className="flex items-center space-x-1">
+              <p className="line-clamp-1">Video Editor</p>
+            </div>
+          </div>
+          <div className="hidden md:flex">
+            <Magnifier onZoomChange={handleZoomChange} initialZoom={zoomLevel} ratio={ratio} isLoading={false} externalZoom={zoomLevel} />
+          </div>
+        </div>
+      </div>
+
+      <TextDock
+        isOpen={isTextOpen}
+        setIsOpen={setIsTextOpen}
+        textInput={textInput}
+        setTextInput={setTextInput}
+        selectedTextAnimation={selectedTextAnimation}
+        setSelectedTextAnimation={setSelectedTextAnimation}
+        onApplyText={handleApplyText}
+        onReset={handleResetText}
+        hasAppliedText={appliedText.trim().length > 0}
+      />
+
+      <div
+        ref={containerRef}
+        className="scrollbar scrollbar-w-1.5 scrollbar-thumb-[#E9E9E9] scrollbar-thumb-rounded-full scrollbar-hover:scrollbar-thumb-black relative flex flex-1 flex-col justify-center overflow-hidden overflow-y-auto rounded-3xl border border-[#F6F6F6] bg-white md:flex"
+      >
+        <StaticTextOverlay
+          textContent={appliedText}
+          startPosition={textStartPosition}
+          duration={textClipCount}
+          isActive={isTextActive}
+          totalClips={activeClips.length}
+          clipWidth={clipWidth}
+          gap={GAP_BETWEEN_CLIPS}
+          onClick={handleTextClick}
+        />
+
+        <div
+          ref={clipsScrollContainerRef}
+          className={twMerge(
+            "scrollbar scrollbar-h-1.5 scrollbar-thumb-[#E9E9E9] scrollbar-thumb-rounded-full scrollbar-hover:scrollbar-thumb-black mx-6 mb-2.5 overflow-x-auto pt-10 pb-6",
+            isTextOpen && "opacity-10"
+          )}
+        >
+          <div className="flex w-full items-center gap-4">
+            {activeClips.map((video, index) => (
+              <VideoClipCard
+                key={video.id}
+                id={video.id}
+                videoUrl={video.url}
+                ratio={ratio}
+                height={constrainedHeight}
+                index={index}
+                isRemoved={false}
+                onRemove={handleRemoveClip}
+                onAdd={handleAddClip}
+              />
+            ))}
+            {removedClips.length > 0 && (
+              <div className="mx-4">
+                <div className={twMerge("flex size-11 items-center justify-center rounded-lg border", "border-[#EDEDED] bg-[#FBFBFB] shadow-md")}>
+                  <Plus size={24} className="text-[#A3A3A3] duration-300" />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="shrink-0 p-6 md:px-8 md:py-4">
+        <RenderButton clips={activeClips} ratio={ratio} />
+      </div>
+    </div>
+  );
+}
+
+const MIN_RENDER_DELAY_MS = 2000;
+const MAX_RENDER_DELAY_MS = 8000;
+
+function RenderButton({
+  clips,
+  ratio,
+}: {
+  clips: typeof SAMPLE_VIDEOS;
+  ratio: "portrait" | "landscape";
+}) {
+  const [isRendering, setIsRendering] = useState(false);
+
+  const handleRender = async () => {
+    setIsRendering(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (MAX_RENDER_DELAY_MS - MIN_RENDER_DELAY_MS + 1)) + MIN_RENDER_DELAY_MS));
+    } finally {
+      setIsRendering(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-end">
+      <Button onClick={handleRender} disabled={isRendering || clips.length === 0} className="min-w-[120px]">
+        {isRendering ? (
+          <span className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            Rendering...
+          </span>
+        ) : (
+          "Render Video"
+        )}
+      </Button>
+    </div>
+  );
+}
