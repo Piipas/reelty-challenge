@@ -79,10 +79,12 @@ export function RenderButton({ clips, texts, ratio }: RenderButtonProps) {
       document.body.appendChild(linkElement);
       linkElement.click();
       linkElement.remove();
+
+      toast.success("Final video downloaded, check you Downloads folder.");
     } catch (error) {
+      console.log(error);
       toast.error("Couldn't download the final video, try again!");
     } finally {
-      toast.success("Final video downloaded, check you Downloads folder.");
       setIsDownloading(false);
     }
   };

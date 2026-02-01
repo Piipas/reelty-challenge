@@ -8,6 +8,8 @@ import DraggableText from "./draggable-text";
 import { Button } from "./ui/button";
 import { twMerge } from "tailwind-merge";
 import VideoClipCard from "./video-clip-card";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { VideoForm } from "./video-form";
 
 interface TimelineProps {
   zoomLevel: number;
@@ -49,6 +51,7 @@ export function Timeline({
   const textDragStartRef = useRef(0);
 
   const [removedClips, setRemovedClips] = useState<typeof SAMPLE_VIDEOS>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const [textPreviewStart, setTextPreviewStart] = useState(0);
   const maxTextStart = Math.max(0, activeClips.length - textClipCount);
@@ -272,12 +275,18 @@ export function Timeline({
                       onAdd={handleAddClip}
                     />
                   ))}
-                  {removedClips.length > 0 && (
-                    <div className="mx-4">
-                      <div className={twMerge("flex size-11 items-center justify-center rounded-lg border", "border-[#EDEDED] bg-[#FBFBFB] shadow-md")}>
-                        <Plus size={24} className="text-[#A3A3A3] duration-300" />
-                      </div>
-                    </div>
+                  {activeClips.length < 6 && (
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant={"secondary"} className="aspect-9/16 h-auto" style={{ width: `${clipWidth}px` }}>
+                          <Plus size={24} className="duration-300 text-gray-400" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogTitle>Add a new video to the timeline.</DialogTitle>
+                        <VideoForm setActiveClips={setActiveClips} setIsDialogOpen={setIsDialogOpen} />
+                      </DialogContent>
+                    </Dialog>
                   )}
                 </div>
               </SortableContext>

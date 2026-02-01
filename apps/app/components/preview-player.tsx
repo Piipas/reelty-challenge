@@ -20,6 +20,7 @@ export function PreviewPlayer({ clips, texts }: { clips: typeof SAMPLE_VIDEOS; t
         controls
         loop
         initiallyMuted
+        acknowledgeRemotionLicense
         inputProps={{
           clips,
           texts: texts.map((text) => {
