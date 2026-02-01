@@ -269,6 +269,7 @@ export function Timeline({
                       videoUrl={video.url}
                       ratio={ratio}
                       height={constrainedHeight}
+                      clipsCount={activeClips.length}
                       index={index}
                       isRemoved={false}
                       onRemove={handleRemoveClip}
