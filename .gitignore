@@ -50,3 +50,5 @@ renders/
 
 # Render server output
 apps/render/renders/
+
+apps\render\build

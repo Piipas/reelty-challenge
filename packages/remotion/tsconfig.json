@@ -1,0 +1,10 @@
+{
+  "extends": "../../apps/render/tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "strict": true,
+    "declaration": true,
+    "rootDir": "."
+  },
+  "include": ["index.ts", "compositions", "lib"]
+}

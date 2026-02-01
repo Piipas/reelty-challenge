@@ -11,15 +11,17 @@
     "remotion:studio": "remotion studio"
   },
   "dependencies": {
-    "@remotion/bundler": "^4.0.0",
-    "@remotion/cli": "^4.0.0",
-    "@remotion/renderer": "^4.0.0",
+    "@remotion/bundler": "4.0.414",
+    "@remotion/cli": "4.0.414",
+    "@remotion/lottie": "4.0.414",
+    "@remotion/media": "4.0.414",
+    "@remotion/renderer": "4.0.414",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "remotion": "^4.0.0",
-    "zod": "^3.22.3"
+    "remotion": "4.0.414",
+    "zod": "3.22.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

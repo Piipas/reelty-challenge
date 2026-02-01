@@ -1,0 +1,24 @@
+{
+  "name": "@rendy/remotion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.25.0",
+  "dependencies": {
+    "@remotion/lottie": "4.0.414",
+    "@remotion/media": "4.0.414",
+    "react": "^19.2.3",
+    "remotion": "4.0.414"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3"
+  }
+}
